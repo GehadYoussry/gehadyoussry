@@ -25,6 +25,7 @@ These CTEs help to create a consistent view of both tables with ranking to ensur
 - SELECT Clause: Chooses the relevant columns from both CTEs. It calculates the Date_Difference between Original_Date and Updated_Date in days using julianday.
   
 - CASE Statement:
+  
 a. WHEN julianday(rp.Original_Date) - julianday(rpu.Updated_Date) < 180 THEN 'Need Confirmation call':
 
 If the date difference is less than 180 days, it indicates that a confirmation call might be needed.
