@@ -1,15 +1,18 @@
 ## Introduction
+
 In many fintech companies, particularly those that need to transfer money to their users as loans, there is a common issue where users change their payment methods to ones not under their names. To address this problem, a demo code has been created to help these fintech companies determine if users have changed their payment methods.
 
 ### Steps:
 **two tables has been created**
 
-The first table, named payout, retrieves the users who will receive money this month.
+- The first table, named payout, retrieves the users who will receive money this month.
 
-The second table, named payout_updated, contains information about users who received money in the previous month.
+- The second table, named payout_updated, contains information about users who received money in the previous month.
 
 **Query Explanation**
+
 The query aims to compare user payment methods and the dates associated with them between two tables: payout (for the current month) and payout_updated (for the previous month). It identifies if users have changed their payment method and checks if the date difference between the two records is significant.
+
 **1. Common Table Expressions (CTEs)**
 - RankedPayout: Selects records from the payout table, assigning a row number rn for each ID, which is useful for ensuring correct row matching in the join.
 
@@ -19,22 +22,32 @@ These CTEs help to create a consistent view of both tables with ranking to ensur
 
 **2. Main Query**
 
--- SELECT Clause: Chooses the relevant columns from both CTEs. It calculates the Date_Difference between Original_Date and Updated_Date in days using julianday.
--- CASE Statement:
+- SELECT Clause: Chooses the relevant columns from both CTEs. It calculates the Date_Difference between Original_Date and Updated_Date in days using julianday.
+  
+- CASE Statement:
 a. WHEN julianday(rp.Original_Date) - julianday(rpu.Updated_Date) < 180 THEN 'Need Confirmation call':
+
 If the date difference is less than 180 days, it indicates that a confirmation call might be needed.
+
 b. WHEN julianday(rp.Original_Date) - julianday(rpu.Updated_Date) > 180 THEN 'More than 6 months':
+
 If the date difference is more than 180 days, it indicates that the dates are too far apart.
+
 c. WHEN rp.Original_Method = rpu.Updated_Method THEN 'Match':
+
 If the payment methods are the same, it’s a match.
+
 d. WHEN Updated_Date = 'New_joiner' THEN 'New_joiner':
+
 This condition checks if the Updated_Date is marked as 'New_joiner', which should be handled as a special case.
+
 **3.Join Condition**
--- INNER JOIN: Joins RankedPayout and RankedPayoutUpdated on ID and ensures that the rows with the same rn are compared.
+
+-INNER JOIN: Joins RankedPayout and RankedPayoutUpdated on ID and ensures that the rows with the same rn are compared.
 
 **4. WHERE Clause** 
 
--- Ensures that only rows with the same rn (row number) in both CTEs are considered.
+-Ensures that only rows with the same rn (row number) in both CTEs are considered.
 
 ## Table Creation
 **Create Pyout Table:**
@@ -158,6 +171,6 @@ WHERE
     rp.rn = rpu.rn;
 ```
 ## Summary:
--- RankedPayout and RankedPayoutUpdated create ordered views of the payout and payout_updated tables, respectively.
--- Main Query compares methods and dates, and categorizes the results based on the date difference and method match.
--- CASE conditions are evaluated to determine if a confirmation call is needed or if there is a mismatch, with a special check for 'New_joiner'.
+- RankedPayout and RankedPayoutUpdated create ordered views of the payout and payout_updated tables, respectively.
+- Main Query compares methods and dates, and categorizes the results based on the date difference and method match.
+-  CASE conditions are evaluated to determine if a confirmation call is needed or if there is a mismatch, with a special check for 'New_joiner'.
